@@ -23,7 +23,7 @@
   margin-bottom: 2px;
 }
 .header-title {
-  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-size: clamp(1.8rem, 3.8vw, 3.1rem);
   font-weight: 800;
   background: linear-gradient(135deg, #ffffff 0%, #fecdd3 35%, #f43f5e 100%);
   -webkit-background-clip: text;
@@ -32,7 +32,7 @@
   margin-bottom: 6px;
 }
 .header-subtitle {
-  font-size: clamp(0.9rem, 1.8vw, 1.08rem);
+  font-size: clamp(0.85rem, 1.8vw, 1.08rem);
   color: var(--text-secondary);
   max-width: 680px;
   margin: 0 auto;
@@ -58,7 +58,7 @@
 .camera-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   max-height: 600px;
   border-radius: 28px;
   overflow: hidden;
@@ -70,13 +70,14 @@
   justify-content: center;
 }
 
+/* Using object-fit: contain guarantees 100% of video is visible without cutting half the frame */
 .camera-video, .camera-canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transform: scaleX(-1);
 }
 
@@ -137,7 +138,7 @@
   border: 1px solid rgba(244, 63, 94, 0.45);
 }
 
-/* Shade Swatches Palette (Desktop Grid vs Mobile Jewel Row) */
+/* Shade Swatches Palette */
 .shades-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -376,16 +377,15 @@
 }
 
 /* ========================================================
-   GOOGLE / STITCH-STYLE FULL-BLEED MOBILE UX (@media < 768px)
+   TRUE MOBILE PHONE OPTIMIZATION (@media < 768px)
    ======================================================== */
 @media (max-width: 768px) {
-  /* Edge-to-Edge full-bleed mobile presentation */
   .studio-container {
     width: 100vw;
     max-width: 100vw;
     margin: 0;
-    padding: 12px 10px 32px 10px;
-    gap: 16px;
+    padding: 8px 8px 32px 8px;
+    gap: 12px;
     border-radius: 0;
     background: transparent;
     border: none;
@@ -394,50 +394,60 @@
   }
   
   .header-wrap {
-    margin: 4px 6px 4px 6px;
-    padding: 10px 14px;
-    border-radius: 22px;
-    background: rgba(11, 15, 25, 0.75);
+    margin: 2px 4px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    background: rgba(11, 15, 25, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(14px);
   }
   .header-title {
-    font-size: 1.65rem;
+    font-size: 1.5rem;
     margin-bottom: 2px;
   }
   .header-subtitle {
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .studio-grid {
+    gap: 14px;
+  }
+
+  /* Fixed height compact mirror using object-fit: contain so 100% of video shows without being cut half! */
+  .camera-wrapper {
+    width: calc(100vw - 16px);
+    margin: 0 auto;
+    aspect-ratio: auto;
+    height: min(45vh, 360px);
+    border-radius: 20px;
+    border: 2px solid rgba(244, 63, 94, 0.55);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.9), 0 0 20px rgba(244, 63, 94, 0.25);
+  }
+
+  /* Compact controls dashboard that fits simultaneously on screen */
+  .controls-dashboard {
+    padding: 14px 12px;
+    gap: 14px;
+    border-radius: 22px;
+    margin: 0;
+    background: rgba(13, 20, 36, 0.88);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .section-title {
     font-size: 0.82rem;
   }
 
-  /* Fixed height compact video container that stays fully visible on phone screens */
-  .camera-wrapper {
-    width: calc(100vw - 20px);
-    margin: 0 auto;
-    aspect-ratio: auto;
-    height: min(52vh, 420px);
-    border-radius: 24px;
-    border: 2px solid rgba(244, 63, 94, 0.5);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.9), 0 0 25px rgba(244, 63, 94, 0.25);
-  }
-
-  .controls-dashboard {
-    padding: 18px 14px;
-    gap: 18px;
-    border-radius: 26px;
-    margin: 0 2px;
-    background: rgba(13, 20, 36, 0.82);
-    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-  }
-
-  /* Stitch Mobile Jewel-Carousel: circular swatch dots that slide smoothly under thumb */
+  /* Horizontal jewel swatch row that scrolls smoothly under thumb */
   .shades-grid {
     display: flex;
     flex-direction: row;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    gap: 12px;
-    padding: 4px 6px 12px 6px;
+    gap: 10px;
+    padding: 2px 4px 8px 4px;
     margin: 0 -4px;
     -webkit-overflow-scrolling: touch;
   }
@@ -446,10 +456,11 @@
     flex: 0 0 auto;
     width: auto;
     scroll-snap-align: start;
-    padding: 8px 15px;
+    padding: 8px 14px;
     border-radius: 999px;
+    font-size: 0.82rem;
     gap: 8px;
-    background: rgba(23, 31, 48, 0.85);
+    background: rgba(23, 31, 48, 0.9);
   }
 
   .shade-swatch {
@@ -457,57 +468,70 @@
     height: 20px;
   }
 
-  /* 2x2 tactile button strip with generous touchscreen padding */
+  /* Compact 2x2 grid for action buttons so they fit cleanly without occupying excessive height */
   .actions-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 8px;
   }
 
   .primary-btn {
     grid-column: 1 / -1;
-    padding: 15px 20px;
-    font-size: 1rem;
+    padding: 14px 18px;
+    font-size: 0.98rem;
   }
 
   .action-pill-btn {
     width: 100%;
     min-width: auto;
-    padding: 13px 10px;
-    font-size: 0.83rem;
-    border-radius: 16px;
+    padding: 11px 8px;
+    font-size: 0.8rem;
+    border-radius: 14px;
+    gap: 5px;
+    line-height: 1.25;
   }
 
-  /* Status badge spans full width cleanly */
   .status-badge {
-    padding: 12px 14px;
-    border-radius: 16px;
-    font-size: 0.84rem;
-    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+  .status-dot {
+    width: 10px;
+    height: 10px;
   }
 
   .guides-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
-    margin: 0 2px;
+    gap: 10px;
   }
   
   .guide-card {
-    padding: 15px;
-    border-radius: 18px;
-    background: rgba(13, 20, 36, 0.75);
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(13, 20, 36, 0.78);
+    gap: 12px;
   }
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+  .step-info h4 { font-size: 0.92rem; margin-bottom: 2px; }
+  .step-info p { font-size: 0.8rem; }
 
   .sparkle-toast {
-    top: 12px;
-    padding: 10px 20px;
-    font-size: 0.85rem;
+    top: 10px;
+    padding: 8px 16px;
+    font-size: 0.82rem;
     max-width: 95vw;
   }
 }
 
 @media (max-width: 400px) {
-  .header-title { font-size: 1.45rem; }
-  .action-pill-btn { font-size: 0.78rem; padding: 11px 8px; gap: 6px; }
-  .camera-wrapper { height: 44vh; }
+  .header-title { font-size: 1.35rem; }
+  .action-pill-btn { font-size: 0.75rem; padding: 10px 6px; gap: 4px; }
+  .camera-wrapper { height: min(42vh, 310px); }
+  .shade-btn { padding: 7px 12px; font-size: 0.78rem; }
 }

@@ -165,7 +165,7 @@ export const StudioCamera: React.FC<Props> = ({
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 1280, height: 720 },
+          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
           audio: false,
         });
         video.srcObject = stream;
