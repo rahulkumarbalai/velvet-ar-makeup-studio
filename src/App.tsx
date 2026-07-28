@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import './styles/index.css';
 import './styles/studio.css';
 import { DEFAULT_SHADE } from './utils/shadesData';
@@ -12,13 +12,14 @@ import { GuideCards } from './components/GuideCards';
 
 export const App: React.FC = () => {
   const [activeShade, setActiveShade] = useState<LipShade>(DEFAULT_SHADE);
-  const [isBlushActive, setIsBlushActive] = useState<boolean>(true);
+  // User explicit request: Blush is preapplied it should be applied after user clicks on Blush: ON
+  const [isBlushActive, setIsBlushActive] = useState<boolean>(false);
   const [eyelinerStyle, setEyelinerStyle] = useState<EyelinerStyle>('none');
   const [isLipsPainted, setIsLipsPainted] = useState<boolean>(false);
   const [isPeekBefore, setIsPeekBefore] = useState<boolean>(false);
   const [cameraRunning, setCameraRunning] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>(
-    'Click "Start Camera Studio" below to initialize real-time makeup detection.'
+    'Click "Start Camera Studio" below to initialize real-time neural makeup detection.'
   );
   const [statusType, setStatusType] = useState<'idle' | 'loading' | 'live' | 'painted'>('idle');
   const [showCelebration, setShowCelebration] = useState<boolean>(false);
@@ -32,6 +33,16 @@ export const App: React.FC = () => {
 
   const videoElementRef = useRef<HTMLVideoElement | null>(null);
   const canvasElementRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Interactive Cursor & Touch tracking for hypnotic ambient glow movements
+  useEffect(() => {
+    const handlePointerMove = (e: PointerEvent) => {
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+    };
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    return () => window.removeEventListener('pointermove', handlePointerMove);
+  }, []);
 
   const handleRegisterMediaRefs = useCallback((video: HTMLVideoElement | null, canvas: HTMLCanvasElement | null) => {
     videoElementRef.current = video;
@@ -48,7 +59,7 @@ export const App: React.FC = () => {
   const handleToggleBlush = () => {
     const nextVal = !isBlushActive;
     setIsBlushActive(nextVal);
-    setStatusMessage(nextVal ? 'Rosy pink cheek blush enabled!' : 'Rosy pink cheek blush disabled.');
+    setStatusMessage(nextVal ? '🌸 Rosy pink cheek blush enabled!' : 'Rosy pink cheek blush disabled.');
   };
 
   const handleCycleEyeliner = () => {
@@ -56,18 +67,18 @@ export const App: React.FC = () => {
     const nextIdx = (styles.indexOf(eyelinerStyle) + 1) % styles.length;
     const nextStyle = styles[nextIdx];
     setEyelinerStyle(nextStyle);
-    if (nextStyle === 'classic') setStatusMessage('Applied Classic Winged Eyeliner!');
-    else if (nextStyle === 'smoky') setStatusMessage('Applied Sultry Smoky Eye styling!');
-    else setStatusMessage('Eyeliner turned OFF.');
+    if (nextStyle === 'classic') setStatusMessage('Applied Classic Liquid Winged Eyeliner!');
+    else if (nextStyle === 'smoky') setStatusMessage('Applied Sultry Smoky Eye shadow diffusion!');
+    else setStatusMessage('Eyeliner styling turned OFF.');
   };
 
   const handleTogglePeekBefore = () => {
     const nextVal = !isPeekBefore;
     setIsPeekBefore(nextVal);
     if (nextVal) {
-      setStatusMessage('Showing your natural untouched look (Peek Before mode ON).');
+      setStatusMessage('Showing your untouched natural look (Peek Before mode ON).');
     } else {
-      setStatusMessage('Restored virtual luxury makeover overlay!');
+      setStatusMessage('Restored virtual luxury AI makeover overlay!');
     }
   };
 
@@ -86,16 +97,13 @@ export const App: React.FC = () => {
 
     if (ctx && offscreen.width > 0 && offscreen.height > 0) {
       ctx.save();
-      // Mirror horizontal video capture
       ctx.translate(offscreen.width, 0);
       ctx.scale(-1, 1);
       ctx.drawImage(video, 0, 0, offscreen.width, offscreen.height);
       ctx.restore();
 
-      // Draw AR canvas overlay on top (canvas is already drawn mirrored in studio)
       ctx.drawImage(canvas, 0, 0, offscreen.width, offscreen.height);
 
-      // Trigger automatic high-res PNG download
       const dataUrl = offscreen.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `velvet-ar-makeover-${activeShade.id}.png`;
@@ -110,7 +118,7 @@ export const App: React.FC = () => {
   const handleResetMakeup = () => {
     setIsLipsPainted(false);
     setIsPeekBefore(false);
-    setStatusMessage('Makeup reset. Guide the lipstick to your mouth to apply again!');
+    setStatusMessage('Makeup reset. Guide the lipstick bullet to your mouth to paint again!');
     setStatusType('live');
     setShowCelebration(false);
   };
@@ -148,49 +156,59 @@ export const App: React.FC = () => {
   const celebrationText = `✨ Magnificent! Makeover in ${activeShade.name} ✨`;
 
   return (
-    <div className="studio-container">
-      <div className={`sparkle-toast ${showCelebration ? 'visible' : ''}`}>{celebrationText}</div>
-
-      <Header />
-
-      <div className="studio-grid">
-        <div style={{ position: 'relative' }}>
-          <StudioCamera
-            cameraRunning={cameraRunning}
-            activeShade={activeShade}
-            isBlushActive={isBlushActive}
-            eyelinerStyle={eyelinerStyle}
-            isLipsPainted={isLipsPainted}
-            isPeekBefore={isPeekBefore}
-            onMakeupApplied={handleMakeupApplied}
-            onStatusChange={handleStatusChange}
-            onOverlayUpdate={handleOverlayUpdate}
-            onRegisterMediaRefs={handleRegisterMediaRefs}
-          />
-          <LipstickOverlay state={overlayState} stops={activeShade.stops} />
-        </div>
-
-        <div className="controls-dashboard">
-          <ShadePalette activeShade={activeShade} onSelectShade={handleSelectShade} />
-          <BlushControl
-            isBlushActive={isBlushActive}
-            eyelinerStyle={eyelinerStyle}
-            isPeekBefore={isPeekBefore}
-            onToggleBlush={handleToggleBlush}
-            onCycleEyeliner={handleCycleEyeliner}
-            onTogglePeekBefore={handleTogglePeekBefore}
-            onTakeSnapshot={handleTakeSnapshot}
-            onResetMakeup={handleResetMakeup}
-            cameraRunning={cameraRunning}
-            onStartCamera={handleStartCamera}
-            statusText={statusMessage}
-            statusType={statusType}
-          />
-        </div>
+    <>
+      {/* Impressive Dynamic & Interactive Ambient Background with Movements */}
+      <div className="ambient-background">
+        <div className="ambient-blob blob-1" />
+        <div className="ambient-blob blob-2" />
+        <div className="ambient-blob blob-3" />
+        <div className="interactive-spotlight" />
       </div>
 
-      <GuideCards />
-    </div>
+      <div className="studio-container">
+        <div className={`sparkle-toast ${showCelebration ? 'visible' : ''}`}>{celebrationText}</div>
+
+        <Header />
+
+        <div className="studio-grid">
+          <div style={{ position: 'relative', width: '100%' }}>
+            <StudioCamera
+              cameraRunning={cameraRunning}
+              activeShade={activeShade}
+              isBlushActive={isBlushActive}
+              eyelinerStyle={eyelinerStyle}
+              isLipsPainted={isLipsPainted}
+              isPeekBefore={isPeekBefore}
+              onMakeupApplied={handleMakeupApplied}
+              onStatusChange={handleStatusChange}
+              onOverlayUpdate={handleOverlayUpdate}
+              onRegisterMediaRefs={handleRegisterMediaRefs}
+            />
+            <LipstickOverlay state={overlayState} stops={activeShade.stops} />
+          </div>
+
+          <div className="controls-dashboard">
+            <ShadePalette activeShade={activeShade} onSelectShade={handleSelectShade} />
+            <BlushControl
+              isBlushActive={isBlushActive}
+              eyelinerStyle={eyelinerStyle}
+              isPeekBefore={isPeekBefore}
+              onToggleBlush={handleToggleBlush}
+              onCycleEyeliner={handleCycleEyeliner}
+              onTogglePeekBefore={handleTogglePeekBefore}
+              onTakeSnapshot={handleTakeSnapshot}
+              onResetMakeup={handleResetMakeup}
+              cameraRunning={cameraRunning}
+              onStartCamera={handleStartCamera}
+              statusText={statusMessage}
+              statusType={statusType}
+            />
+          </div>
+        </div>
+
+        <GuideCards />
+      </div>
+    </>
   );
 };
 export default App;
