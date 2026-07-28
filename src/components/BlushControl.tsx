@@ -30,9 +30,10 @@ export const BlushControl: React.FC<Props> = ({
   statusText,
   statusType,
 }) => {
+  // Ultra-responsive concise labels for mobile touchscreens
   const getEyelinerLabel = () => {
-    if (eyelinerStyle === 'classic') return '👁️ Eyeliner: Classic Wing';
-    if (eyelinerStyle === 'smoky') return '👁️ Eyeliner: Sultry Smoke';
+    if (eyelinerStyle === 'classic') return '👁️ Eyeliner: Wing';
+    if (eyelinerStyle === 'smoky') return '👁️ Eyeliner: Smoky';
     return '👁️ Eyeliner: OFF';
   };
 
@@ -43,14 +44,16 @@ export const BlushControl: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       <div className="section-title">
         <span>✨ Interactive Makeover Suite</span>
+        {cameraRunning && <span className="section-badge">Live Controls</span>}
       </div>
+
       <div className="actions-row">
         {!cameraRunning && (
           <button type="button" onClick={onStartCamera} className="primary-btn">
-            Start Camera Studio
+            🚀 Start Camera Studio
           </button>
         )}
         {cameraRunning && (
@@ -75,8 +78,9 @@ export const BlushControl: React.FC<Props> = ({
               type="button"
               onClick={onTakeSnapshot}
               className="action-pill-btn snapshot"
+              title="Download high-resolution selfie"
             >
-              📸 Take Selfie
+              📸 Capture Selfie
             </button>
 
             <button
@@ -85,11 +89,15 @@ export const BlushControl: React.FC<Props> = ({
               className={`action-pill-btn ${isPeekBefore ? 'active-amber' : ''}`}
               title="Compare natural look with virtual makeover"
             >
-              🔍 {isPeekBefore ? 'Showing Natural' : 'Peek Original'}
+              🔍 {isPeekBefore ? 'Showing Natural' : 'Compare Before'}
             </button>
 
-            <button type="button" onClick={onResetMakeup} className="action-pill-btn" style={{ flex: '1 1 100%' }}>
-              💫 Reset Studio Makeup
+            <button
+              type="button"
+              onClick={onResetMakeup}
+              className="reset-btn"
+            >
+              💫 Reset Makeover Studio
             </button>
           </>
         )}
