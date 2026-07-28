@@ -164,8 +164,12 @@ export const StudioCamera: React.FC<Props> = ({
       }
 
       try {
+        const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+        const targetWidth = isMobile ? 720 : 1280;
+        const targetHeight = isMobile ? 1280 : 720;
+
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+          video: { width: { ideal: targetWidth }, height: { ideal: targetHeight }, facingMode: 'user' },
           audio: false,
         });
         video.srcObject = stream;
@@ -198,8 +202,8 @@ export const StudioCamera: React.FC<Props> = ({
               await holisticInstanceRef.current.send({ image: videoRef.current });
             }
           },
-          width: 1280,
-          height: 720,
+          width: targetWidth,
+          height: targetHeight,
         });
 
         cameraInstanceRef.current = camera;

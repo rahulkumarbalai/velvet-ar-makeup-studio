@@ -55,7 +55,7 @@
 }
 
 /* ========================================================
-   UN-CLIPPED RESPONSIVE CAMERA WRAPPER & VIDEO STYLING
+   UN-CLIPPED & GAP-FREE CAMERA WRAPPER & VIDEO STYLING
    ======================================================== */
 .camera-wrapper {
   position: relative;
@@ -71,12 +71,11 @@
   margin: 0 auto;
 }
 
-/* By using position: relative on video, the wrapper naturally expands to show 100% of the stream without EVER cutting it in half! */
+/* Letting video height dictate container height naturally prevents ALL empty gaps and clipping! */
 .camera-video {
   position: relative;
   width: 100%;
   height: auto;
-  max-height: 640px;
   object-fit: contain;
   transform: scaleX(-1);
   display: block;
@@ -448,29 +447,42 @@
     gap: 16px;
   }
 
-  /* 100% Fully Visible camera preview without EVER being half-cut or sliced! */
+  /* Zero gap, 100% full-width mobile camera container */
   .camera-wrapper {
-    width: calc(100vw - 24px);
+    width: 100%;
     margin: 0 auto;
     height: auto;
-    max-height: min(58vh, 520px);
     aspect-ratio: auto;
     border-radius: 22px;
     border: 2px solid rgba(244, 63, 94, 0.55);
     box-shadow: 0 14px 32px rgba(0, 0, 0, 0.9), 0 0 22px rgba(244, 63, 94, 0.25);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
+  /* Removing artificial max-height prevents empty side gaps when aspect ratios interact with mirror transform */
   .camera-video {
     position: relative;
     width: 100%;
     height: auto;
-    max-height: min(58vh, 520px);
-    object-fit: contain;
+    object-fit: cover;
     display: block;
     margin: 0 auto;
   }
 
-  /* Match controls dashboard style to Guide Cards (which user confirmed displays properly!) */
+  .camera-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 10;
+  }
+
   .controls-dashboard {
     padding: 20px 16px;
     gap: 18px;
@@ -485,7 +497,6 @@
     font-size: 0.86rem;
   }
 
-  /* Horizontal swipeable luxury swatch bar */
   .shades-grid {
     display: flex;
     flex-direction: row;
@@ -513,7 +524,6 @@
     height: 22px;
   }
 
-  /* Responsive 2-column grid for action suite so every button fits cleanly without breaking */
   .actions-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
