@@ -62,13 +62,14 @@
 }
 
 /* ========================================================
-   DESKTOP CAMERA WRAPPER & VIDEO STYLING
+   DESKTOP / PC CAMERA STYLING (DEFAULT WEBCAM RATIO)
    ======================================================== */
 .camera-wrapper {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
-  max-height: 580px;
+  aspect-ratio: auto;
+  min-height: 340px;
+  max-height: 600px;
   border-radius: 28px;
   overflow: hidden;
   background: #03060c;
@@ -81,20 +82,30 @@
   box-sizing: border-box;
 }
 
-.camera-video, .camera-canvas {
+/* On PC, video height drives the wrapper height naturally so it respects default webcam ratios (4:3, 16:9, etc.) without cropping! */
+.camera-video {
+  position: relative;
+  width: 100%;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  object-position: center center;
+  transform: scaleX(-1);
+  transform-origin: center center;
+  display: block;
+  margin: 0 auto;
+}
+
+.camera-canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center center;
   transform: scaleX(-1);
   transform-origin: center center;
-  display: block;
-}
-
-.camera-canvas {
   pointer-events: none;
   z-index: 10;
 }
@@ -442,7 +453,7 @@
 }
 
 /* ========================================================
-   STRICT OVERFLOW-PROOF MOBILE PHONE OPTIMIZATION (@media < 768px)
+   MOBILE SCREEN CAMERA STYLING (EXACT 4:3 RATIO) (@media < 768px)
    ======================================================== */
 @media (max-width: 768px) {
   .studio-container {
@@ -490,17 +501,18 @@
   }
 
   /* 
-     COMPACT 320px MOBILE CAMERA MIRROR:
-     - Solves excessive height (capped at 320px square so controls below stay easily visible!)
-     - Centered object-fit: cover eliminates left/right gaps without clipping face!
-     - width: 100% with box-sizing stops off-center left shifting!
+     EXACT 4:3 ASPECT RATIO FOR MOBILE SCREENS:
+     - Enforces aspect-ratio: 4 / 3 as requested!
+     - Prevents too much vertical height!
+     - Centered object-fit: cover guarantees no left gaps or shifting!
   */
   .camera-wrapper {
     width: 100%;
-    max-width: 340px;
-    height: 320px;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
     margin: 0 auto;
-    border-radius: 24px;
+    border-radius: 22px;
     border: 2px solid rgba(244, 63, 94, 0.55);
     box-shadow: 0 14px 32px rgba(0, 0, 0, 0.9), 0 0 22px rgba(244, 63, 94, 0.25);
     overflow: hidden;
@@ -654,5 +666,5 @@
   .header-title { font-size: 1.35rem; }
   .action-pill-btn { font-size: 0.76rem; padding: 11px 6px; gap: 4px; }
   .shade-btn { padding: 8px 12px; font-size: 0.8rem; }
-  .camera-wrapper { max-width: 300px; height: 290px; }
+  .camera-wrapper { aspect-ratio: 4 / 3; }
 }

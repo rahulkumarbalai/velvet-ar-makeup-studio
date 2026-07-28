@@ -165,14 +165,18 @@ export const StudioCamera: React.FC<Props> = ({
 
       try {
         const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-        const targetWidth = isMobile ? 720 : 1280;
-        const targetHeight = isMobile ? 1280 : 720;
 
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: { ideal: targetWidth }, height: { ideal: targetHeight }, facingMode: 'user' },
+          video: isMobile
+            ? { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }
+            : { facingMode: 'user' }, // Allows PC webcam to initialize at its natural default hardware aspect ratio
           audio: false,
         });
         video.srcObject = stream;
+
+        const settings = stream.getVideoTracks()[0]?.getSettings() || {};
+        const camWidth = settings.width || (isMobile ? 640 : 1280);
+        const camHeight = settings.height || (isMobile ? 480 : 720);
 
         const HolisticClass = (window as any).Holistic;
         const CameraClass = (window as any).Camera;
@@ -202,8 +206,8 @@ export const StudioCamera: React.FC<Props> = ({
               await holisticInstanceRef.current.send({ image: videoRef.current });
             }
           },
-          width: targetWidth,
-          height: targetHeight,
+          width: camWidth,
+          height: camHeight,
         });
 
         cameraInstanceRef.current = camera;
